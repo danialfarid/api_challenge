@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Bootstraps the Spring Boot com.disney.studios.Application
- *
+ * <p>
  * Created by fredjean on 9/21/15.
  */
 @SpringBootApplication

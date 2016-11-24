@@ -1,5 +1,7 @@
 package com.disney.studios;
 
+import com.disney.studios.db.DataStore;
+import com.disney.studios.model.Dog;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +12,13 @@ import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Loads stored objects from the file system and builds up
  * the appropriate objects to add to the data source.
- *
+ * <p>
  * Created by fredjean on 9/21/15.
  */
 @Component
@@ -35,6 +39,9 @@ public class PetLoader implements InitializingBean {
     @Autowired
     DataSource dataSource;
 
+    @Autowired
+    DataStore dataStore;
+
     /**
      * Load the different breeds into the data source after
      * the application is ready.
@@ -43,27 +50,31 @@ public class PetLoader implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        loadBreed("Labrador", labradors);
-        loadBreed("Pug", pugs);
-        loadBreed("Retriever", retrievers);
-        loadBreed("Yorkie", yorkies);
+        Connection connection = dataSource.getConnection();
+        try {
+            dataStore.createTables();
+            loadBreed("Labrador", labradors);
+            loadBreed("Pug", pugs);
+            loadBreed("Retriever", retrievers);
+            loadBreed("Yorkie", yorkies);
+        } finally {
+            connection.close();
+        }
     }
 
     /**
      * Reads the list of dogs in a category and (eventually) add
      * them to the data source.
-     * @param breed The breed that we are loading.
+     *
+     * @param breed  The breed that we are loading.
      * @param source The file holding the breeds.
      * @throws IOException In case things go horribly, horribly wrong.
      */
-    private void loadBreed(String breed, Resource source) throws IOException {
-        try ( BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
+    private void loadBreed(String breed, Resource source) throws IOException, SQLException {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
-                /* TODO: Create appropriate objects and save them to
-                 *       the datasource.
-                 */
+                dataStore.addDog(new Dog(null, line, breed, 0));
             }
         }
     }
