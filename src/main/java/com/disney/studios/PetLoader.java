@@ -1,6 +1,6 @@
 package com.disney.studios;
 
-import com.disney.studios.db.DataStore;
+import com.disney.studios.db.DogRepository;
 import com.disney.studios.model.Dog;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -37,10 +35,7 @@ public class PetLoader implements InitializingBean {
     private Resource yorkies;
 
     @Autowired
-    DataSource dataSource;
-
-    @Autowired
-    DataStore dataStore;
+    DogRepository dogRepo;
 
     /**
      * Load the different breeds into the data source after
@@ -50,16 +45,10 @@ public class PetLoader implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        Connection connection = dataSource.getConnection();
-        try {
-            dataStore.createTables();
-            loadBreed("Labrador", labradors);
-            loadBreed("Pug", pugs);
-            loadBreed("Retriever", retrievers);
-            loadBreed("Yorkie", yorkies);
-        } finally {
-            connection.close();
-        }
+        loadBreed("Labrador", labradors);
+        loadBreed("Pug", pugs);
+        loadBreed("Retriever", retrievers);
+        loadBreed("Yorkie", yorkies);
     }
 
     /**
@@ -74,7 +63,7 @@ public class PetLoader implements InitializingBean {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()))) {
             String line;
             while ((line = br.readLine()) != null) {
-                dataStore.addDog(new Dog(null, line, breed, 0));
+                dogRepo.save(new Dog(line, breed, 0));
             }
         }
     }

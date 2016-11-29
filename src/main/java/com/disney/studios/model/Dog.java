@@ -1,19 +1,31 @@
 package com.disney.studios.model;
 
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
 public class Dog {
-    Long id;
-    String url;
-    String breed;
-    int vote;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String url;
+
+    private String breed;
+
+    private int votes;
+
+    @ElementCollection
+    private Set<Long> favorites = new HashSet<>();
 
     public Dog() {
     }
 
-    public Dog(Long id, String url, String breed, int vote) {
-        this.id = id;
+    public Dog(String url, String breed, int votes) {
         this.url = url;
         this.breed = breed;
-        this.vote = vote;
+        this.votes = votes;
     }
 
     public Long getId() {
@@ -40,11 +52,19 @@ public class Dog {
         this.breed = breed;
     }
 
-    public int getVote() {
-        return vote;
+    public int getVotes() {
+        return votes;
     }
 
-    public void setVote(int vote) {
-        this.vote = vote;
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
+
+    public Set<Long> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(Set<Long> favorites) {
+        this.favorites = favorites;
     }
 }

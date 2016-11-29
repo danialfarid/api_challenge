@@ -19,11 +19,11 @@ public class DogControllerTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void testGet() {
+    public void testGetAll() {
         ResponseEntity<Dog[]> entity = restTemplate.getForEntity("/dogs", Dog[].class);
         assertThat(entity.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(entity.getBody().length).isEqualTo(90);
-        System.out.println(entity.getBody());
+        assertThat(entity.getBody()[0].getBreed()).isEqualTo("Labrador");
     }
 
     @Test
@@ -31,7 +31,7 @@ public class DogControllerTest {
         ResponseEntity<Dog[]> entity = restTemplate.getForEntity("/dogs/Retriever", Dog[].class);
         assertThat(entity.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(entity.getBody().length).isEqualTo(33);
-        System.out.println(entity.getBody());
+        assertThat(entity.getBody()[0].getBreed()).isEqualTo("Retriever");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class DogControllerTest {
         restTemplate.put("/dogs/11/favorites/5", null);
 
         Dog[] dogs = restTemplate.getForEntity("/dogs", Dog[].class).getBody();
-        assertThat(dogs[0].getVote()).isEqualTo(3);
+        assertThat(dogs[0].getVotes()).isEqualTo(3);
 
         // make sure they are sorted by favorites
         assertThat(dogs[0].getId()).isEqualTo(10);
@@ -57,7 +57,7 @@ public class DogControllerTest {
         restTemplate.delete("/dogs/10/favorites/2");
 
         dogs = restTemplate.getForEntity("/dogs", Dog[].class).getBody();
-        assertThat(dogs[1].getVote()).isEqualTo(1);
+        assertThat(dogs[1].getVotes()).isEqualTo(1);
 
         // make sure they are sorted by favorites
         assertThat(dogs[0].getId()).isEqualTo(11);

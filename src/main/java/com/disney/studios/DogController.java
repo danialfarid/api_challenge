@@ -20,7 +20,7 @@ public class DogController {
     DogService dogService;
 
     @RequestMapping(method = GET, path = "/dogs")
-    public List<Dog> getDogs() throws IOException {
+    public Iterable<Dog> getDogs() throws IOException {
         return dogService.getDogs();
     }
 
